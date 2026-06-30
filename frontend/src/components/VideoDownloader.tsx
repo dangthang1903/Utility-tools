@@ -110,8 +110,8 @@ export default function VideoDownloader() {
     };
 
     try {
-      // Gửi yêu cầu tới NestJS Backend Proxy trên cổng 3009
-      const response = await fetch('http://localhost:3009/download', {
+      // Gửi yêu cầu tới API (Monolith)
+      const response = await fetch('/download', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
