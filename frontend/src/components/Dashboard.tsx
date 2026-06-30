@@ -9,9 +9,13 @@ import {
   X,
   Layers,
   Wrench,
-  ChevronRight
+  ChevronRight,
+  Image as ImageIcon,
+  Music
 } from 'lucide-react';
 import VideoDownloader from './VideoDownloader';
+import ImageTool from './ImageTool';
+import AudioTool from './AudioTool';
 
 const Youtube = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
   <svg
@@ -48,6 +52,24 @@ export default function Dashboard() {
       category: 'media',
       isAvailable: true,
       component: <VideoDownloader />
+    },
+    {
+      id: 'image-optimizer',
+      name: 'Image Optimizer',
+      description: 'Ép size, đổi định dạng và thu phóng ảnh mượt mà.',
+      icon: <ImageIcon style={{ width: '20px', height: '20px' }} className="text-purple-400" />,
+      category: 'media',
+      isAvailable: true,
+      component: <ImageTool />
+    },
+    {
+      id: 'audio-studio',
+      name: 'Audio Studio',
+      description: 'Cắt nhạc, ghép nối và ép dung lượng file âm thanh.',
+      icon: <Music style={{ width: '20px', height: '20px' }} className="text-cyan-400" />,
+      category: 'media',
+      isAvailable: true,
+      component: <AudioTool />
     },
     {
       id: 'json-formatter',

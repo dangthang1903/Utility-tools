@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Download, 
-  Film, 
-  Music, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clipboard, 
-  Trash2, 
-  RefreshCw, 
+import {
+  Download,
+  Film,
+  Music,
+  AlertTriangle,
+  CheckCircle,
+  Clipboard,
+  Trash2,
+  RefreshCw,
   ExternalLink
 } from 'lucide-react';
 
@@ -27,7 +27,7 @@ export default function VideoDownloader() {
   const [downloadType, setDownloadType] = useState<'video' | 'audio'>('video');
   const [videoQuality, setVideoQuality] = useState<string>('1080');
   const [audioBitrate, setAudioBitrate] = useState<string>('320');
-  
+
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -37,13 +37,13 @@ export default function VideoDownloader() {
   // Giả lập các bước xử lý để trải nghiệm mượt mà hơn
   useEffect(() => {
     if (!loading) return;
-    
+
     const stages = [
       'Đang gửi yêu cầu tới NestJS Backend...',
       'Backend đang tìm kiếm máy chủ API rảnh...',
       'Đang phân tích và giải mã luồng video...',
-      downloadType === 'video' && parseInt(videoQuality) >= 720 
-        ? 'Đang tiến hành ghép luồng hình ảnh & âm thanh chất lượng cao...' 
+      downloadType === 'video' && parseInt(videoQuality) >= 720
+        ? 'Đang tiến hành ghép luồng hình ảnh & âm thanh chất lượng cao...'
         : 'Đang khởi tạo file tải về...',
       'Hoàn thành! Chuẩn bị nhận link tải...',
     ].filter(Boolean) as string[];
@@ -125,7 +125,7 @@ export default function VideoDownloader() {
       }
 
       const data = await response.json();
-      
+
       if (data.status === 'redirect' || data.status === 'tunnel' || data.url) {
         setDownloadUrl(data.url);
         setFileName(data.filename || 'Youtube_Media_Download');
@@ -147,7 +147,7 @@ export default function VideoDownloader() {
 
   return (
     <div className="downloader-wrapper">
-      
+
       {/* Downloader Header */}
       <div className="downloader-header-section">
         <div className="header-icon-box">
@@ -162,7 +162,7 @@ export default function VideoDownloader() {
       </div>
 
       <div className="glass-panel downloader-form-card">
-        
+
         {/* Glowing Blobs inside Card */}
         <div className="glow-spot-1" />
         <div className="glow-spot-2" />
@@ -170,7 +170,7 @@ export default function VideoDownloader() {
         {/* Downloader Form */}
         {!downloadUrl && !loading && (
           <form onSubmit={handleSubmit} className="downloader-form">
-            
+
             {/* Link Input Section */}
             <div>
               <label className="field-label">
@@ -238,7 +238,7 @@ export default function VideoDownloader() {
               <label className="field-label">
                 Chọn chất lượng tải về
               </label>
-              
+
               {downloadType === 'video' ? (
                 /* Video Quality Cards */
                 <div className="quality-cards-grid">
@@ -321,7 +321,7 @@ export default function VideoDownloader() {
             <div className="success-badge-glow">
               <CheckCircle style={{ width: '32px', height: '32px' }} />
             </div>
-            
+
             <div className="success-meta-wrapper">
               <h3 className="success-title">Chuyển đổi thành công!</h3>
               <p className="success-format-type">
@@ -354,7 +354,7 @@ export default function VideoDownloader() {
                 Tải video khác
               </button>
             </div>
-            
+
             <p className="success-tip-small">
               Mẹo: Nếu file tự động phát trên trình duyệt thay vì tải về, bạn chỉ cần nhấn chuột phải vào video chọn "Lưu video thành..." (hoặc nhấn tổ hợp phím Ctrl+S).
             </p>
