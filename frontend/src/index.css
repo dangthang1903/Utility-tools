@@ -40,7 +40,7 @@ body {
   background-color: hsl(var(--bg-dark));
   color: hsl(var(--text-primary));
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   position: relative;
