@@ -11,11 +11,13 @@ import {
   Wrench,
   ChevronRight,
   Image as ImageIcon,
-  Music
+  Music,
+  QrCode
 } from 'lucide-react';
 import VideoDownloader from './VideoDownloader';
 import ImageTool from './ImageTool';
 import AudioTool from './AudioTool';
+import QrCodeGenerator from './QrCodeGenerator';
 
 const Youtube = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
   <svg
@@ -70,6 +72,15 @@ export default function Dashboard() {
       category: 'media',
       isAvailable: true,
       component: <AudioTool />
+    },
+    {
+      id: 'qrcode-generator',
+      name: 'QR Code Generator',
+      description: 'Tạo mã QR tùy chỉnh cho URL, Văn bản, WiFi và hơn thế nữa.',
+      icon: <QrCode style={{ width: '20px', height: '20px' }} className="text-emerald-400" />,
+      category: 'developer',
+      isAvailable: true,
+      component: <QrCodeGenerator />
     },
     {
       id: 'json-formatter',
