@@ -206,8 +206,8 @@ export class DownloadService {
 
     const filename = `${cleanTitle}.${ext}`;
     
-    // Tạo đường dẫn redirect về endpoint stream của NestJS
-    const streamUrl = `http://localhost:3009/download/stream?url=${encodeURIComponent(url)}&format=${encodeURIComponent(formatSelection)}&filename=${encodeURIComponent(filename)}`;
+    // Tạo đường dẫn redirect dạng tương đối để thông qua proxy của frontend (Vite)
+    const streamUrl = `/download/stream?url=${encodeURIComponent(url)}&format=${encodeURIComponent(formatSelection)}&filename=${encodeURIComponent(filename)}`;
     
     return {
       status: 'redirect',
