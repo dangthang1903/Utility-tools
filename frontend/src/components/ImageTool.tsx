@@ -94,7 +94,6 @@ export default function ImageTool() {
     setProcessing(true);
 
     const img = new Image();
-    img.crossOrigin = "Anonymous";
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = width || img.width;
@@ -242,7 +241,7 @@ export default function ImageTool() {
                 {/* Format selection */}
                 <div>
                   <label className="field-label">Định dạng đầu ra</label>
-                  <div className="tabs-selector-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                  <div className="tabs-3-cols">
                     <div 
                       className={`tab-select-btn ${targetFormat === 'image/jpeg' ? 'tab-select-btn-active-video' : ''}`}
                       onClick={() => setTargetFormat('image/jpeg')}
@@ -270,7 +269,7 @@ export default function ImageTool() {
                 {/* Resize */}
                 <div>
                   <label className="field-label">Kích thước (Resize)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div className="responsive-flex-row">
                     <div style={{ flex: 1 }}>
                       <input 
                         type="number" 
@@ -327,7 +326,7 @@ export default function ImageTool() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+            <div className="action-buttons-row">
               <button type="button" onClick={resetAll} className="btn btn-secondary" style={{ flex: 1 }}>
                 Chọn ảnh khác
               </button>

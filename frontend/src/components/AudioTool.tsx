@@ -142,7 +142,7 @@ export default function AudioTool() {
 
         {/* Tabs */}
         {!resultUrl && !processing && (
-          <div className="tabs-selector-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr', marginBottom: '28px' }}>
+          <div className="tabs-3-cols" style={{ marginBottom: '28px' }}>
             <div 
               className={`tab-select-btn ${activeTab === 'trim' ? 'tab-select-btn-active-audio' : ''}`}
               onClick={() => { setActiveTab('trim'); setFiles([]); }}
@@ -234,7 +234,7 @@ export default function AudioTool() {
             {files.length > 0 && (
               <div style={{ marginBottom: '24px' }}>
                 {activeTab === 'trim' && (
-                  <div style={{ display: 'flex', gap: '16px' }}>
+                  <div className="responsive-flex-row">
                     <div style={{ flex: 1 }}>
                       <label className="field-label">Thời gian bắt đầu</label>
                       <input 
@@ -290,7 +290,7 @@ export default function AudioTool() {
             )}
 
             {files.length > 0 && (
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div className="action-buttons-row">
                 <button type="button" onClick={resetAll} className="btn btn-secondary" style={{ flex: 1 }}>
                   Hủy
                 </button>

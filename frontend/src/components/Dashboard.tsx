@@ -42,7 +42,7 @@ interface Tool {
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeToolId, setActiveToolId] = useState('youtube-downloader');
+  const [activeToolId, setActiveToolId] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
 
   const tools: Tool[] = [
@@ -132,7 +132,7 @@ export default function Dashboard() {
       
       {/* Mobile Top Navbar */}
       <header className="mobile-navbar">
-        <div className="sidebar-brand" style={{ marginBottom: 0 }}>
+        <div className="sidebar-brand" style={{ marginBottom: 0, cursor: 'pointer' }} onClick={() => { setActiveToolId('dashboard'); setActiveCategory('all'); setSidebarOpen(false); }}>
           <div className="brand-icon-container" style={{ padding: '8px' }}>
             <Wrench style={{ width: '18px', height: '18px', color: 'white' }} />
           </div>
@@ -150,7 +150,7 @@ export default function Dashboard() {
       <aside className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
         
         {/* Sidebar Header */}
-        <div className="sidebar-brand">
+        <div className="sidebar-brand" style={{ cursor: 'pointer' }} onClick={() => { setActiveToolId('dashboard'); setActiveCategory('all'); setSidebarOpen(false); }}>
           <div className="brand-icon-container">
             <Wrench style={{ width: '20px', height: '20px', color: 'white' }} />
           </div>
@@ -178,6 +178,7 @@ export default function Dashboard() {
                 key={cat.id}
                 onClick={() => {
                   setActiveCategory(cat.id);
+                  setActiveToolId('dashboard');
                   setSidebarOpen(false);
                 }}
                 className={`category-btn ${activeCategory === cat.id ? 'category-btn-active' : ''}`}
@@ -192,39 +193,6 @@ export default function Dashboard() {
           </nav>
         </div>
 
-        {/* Tools Quick List */}
-        <div className="sidebar-tools-list">
-          <h3 className="sidebar-section-title">Công cụ</h3>
-          {filteredTools.length === 0 ? (
-            <p style={{ fontSize: '0.75rem', color: '#64748b', paddingLeft: '8px', fontStyle: 'italic' }}>Không tìm thấy công cụ</p>
-          ) : (
-            filteredTools.map((tool) => (
-              <button
-                key={tool.id}
-                onClick={() => {
-                  if (tool.isAvailable) {
-                    setActiveToolId(tool.id);
-                    setSidebarOpen(false);
-                  }
-                }}
-                className={`tool-list-item ${activeToolId === tool.id && tool.isAvailable ? 'tool-list-item-active' : ''} ${!tool.isAvailable ? 'tool-list-item-disabled' : ''}`}
-              >
-                <div className="tool-item-icon-wrapper">
-                  {tool.icon}
-                </div>
-                <div className="tool-item-meta">
-                  <div className="tool-item-title-row">
-                    <span className="tool-item-name">{tool.name}</span>
-                    {!tool.isAvailable && (
-                      <span className="tool-badge-soon">Soon</span>
-                    )}
-                  </div>
-                  <span className="tool-item-desc">{tool.description}</span>
-                </div>
-              </button>
-            ))
-          )}
-        </div>
 
         {/* Sidebar Footer */}
         <div className="sidebar-footer-container">
@@ -247,7 +215,49 @@ export default function Dashboard() {
       {/* Main Workspace Area */}
       <main className="dashboard-main-content">
         <div className="workspace-inner">
-          {activeTool && activeTool.isAvailable ? (
+          {activeToolId === 'dashboard' ? (
+            <div className="dashboard-home-view animate-fade-in">
+              <h1 className="header-title glow-text-primary" style={{ textAlign: 'left', marginBottom: '8px' }}>
+                Khám phá công cụ
+              </h1>
+              <p style={{ color: 'hsl(var(--text-secondary))', marginBottom: '32px' }}>
+                Chào mừng bạn đến với OmniTools! Lựa chọn công cụ bên dưới để bắt đầu.
+              </p>
+              
+              <div className="tool-cards-grid">
+                {filteredTools.length === 0 ? (
+                  <p style={{ color: 'hsl(var(--text-muted))' }}>Không tìm thấy công cụ phù hợp.</p>
+                ) : (
+                  filteredTools.map(tool => (
+                    <div 
+                      key={tool.id} 
+                      className={`tool-card ${!tool.isAvailable ? 'tool-card-disabled' : ''}`}
+                      onClick={() => {
+                        if (tool.isAvailable) {
+                          setActiveToolId(tool.id);
+                        }
+                      }}
+                    >
+                      <div className="tool-card-icon">
+                        {tool.icon}
+                      </div>
+                      <div className="tool-card-content">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <h3 className="tool-card-title">{tool.name}</h3>
+                          {!tool.isAvailable && <span className="tool-badge-soon">Soon</span>}
+                        </div>
+                        <p className="tool-card-desc">{tool.description}</p>
+                      </div>
+                      <div className="tool-card-action">
+                        {tool.isAvailable ? 'Mở công cụ' : 'Sắp ra mắt'}
+                        <ChevronRight style={{ width: '16px', height: '16px' }} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          ) : activeTool && activeTool.isAvailable ? (
             activeTool.component
           ) : (
             <div className="coming-soon-wrapper">
