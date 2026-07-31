@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/download': 'http://127.0.0.1:3009',
-      '/api': 'http://127.0.0.1:3009'
+      '/download': 'http://127.0.0.1:3100',
+      '/api': 'http://127.0.0.1:3100'
     }
   }
 })

@@ -18,6 +18,7 @@ import VideoDownloader from './VideoDownloader';
 import ImageTool from './ImageTool';
 import AudioTool from './AudioTool';
 import QrCodeGenerator from './QrCodeGenerator';
+import MusicPlayer from './MusicPlayer';
 
 const Youtube = ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
   <svg
@@ -81,6 +82,15 @@ export default function Dashboard() {
       category: 'developer',
       isAvailable: true,
       component: <QrCodeGenerator />
+    },
+    {
+      id: 'music-player',
+      name: 'Trình Phát Nhạc',
+      description: 'Tìm kiếm và nghe nhạc trực tiếp từ YouTube Music cực mượt.',
+      icon: <Music style={{ width: '20px', height: '20px' }} className="text-pink-400" />,
+      category: 'media',
+      isAvailable: true,
+      component: <MusicPlayer />
     },
     {
       id: 'json-formatter',

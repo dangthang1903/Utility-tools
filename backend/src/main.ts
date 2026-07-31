@@ -12,7 +12,7 @@ async function bootstrap() {
   app.enableCors();
 
   // Chạy trên cổng 3001 để tránh xung đột với cổng 3000 của các ứng dụng khác (như LIMS)
-  await app.listen(process.env.PORT ?? 3009);
-  console.log(`[NestJS Backend] Running on: http://localhost:3009`);
+  await app.listen(process.env.PORT ?? 3100);
+  console.log(`[NestJS Backend] Running on: http://localhost:3100`);
 }
 bootstrap();
