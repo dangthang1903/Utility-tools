@@ -5,7 +5,7 @@ FROM node:20-bookworm-slim AS frontend-builder
 WORKDIR /app/frontend
 
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY frontend/ ./
 RUN npm run build
@@ -18,7 +18,7 @@ WORKDIR /app/backend
 
 COPY backend/package*.json ./
 ENV YOUTUBE_DL_SKIP_DOWNLOAD=1
-RUN npm ci
+RUN npm install
 
 COPY backend/ ./
 RUN npm run build
@@ -45,7 +45,7 @@ WORKDIR /app
 # Cài đặt production dependencies cho backend
 COPY backend/package*.json ./
 ENV YOUTUBE_DL_SKIP_DOWNLOAD=1
-RUN npm ci --omit=dev
+RUN npm install --omit=dev
 
 # Copy mã nguồn backend đã biên dịch
 COPY --from=backend-builder /app/backend/dist ./dist
