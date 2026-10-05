@@ -6,7 +6,10 @@ import * as os from 'os';
 // Require is safer for fluent-ffmpeg in NestJS
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+const ffmpegPath = process.env.FFMPEG_PATH || (ffmpegInstaller && ffmpegInstaller.path);
+if (ffmpegPath) {
+  ffmpeg.setFfmpegPath(ffmpegPath);
+}
 
 @Injectable()
 export class AudioService {

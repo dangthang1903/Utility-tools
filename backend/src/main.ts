@@ -11,8 +11,8 @@ async function bootstrap() {
   // Bật CORS cho phép frontend React kết nối
   app.enableCors();
 
-  // Chạy trên cổng 3001 để tránh xung đột với cổng 3000 của các ứng dụng khác (như LIMS)
-  await app.listen(process.env.PORT ?? 3100);
-  console.log(`[NestJS Backend] Running on: http://localhost:3100`);
+  const port = process.env.PORT ?? 3100;
+  await app.listen(port, '0.0.0.0');
+  console.log(`[NestJS Backend] Running on: http://0.0.0.0:${port}`);
 }
 bootstrap();
