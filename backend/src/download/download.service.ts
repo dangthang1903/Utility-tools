@@ -1,6 +1,9 @@
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import youtubedl from 'youtube-dl-exec';
 import * as express from 'express';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 const DEFAULT_COBALT_INSTANCES = [
   'https://api.cobalt.tools',
@@ -130,6 +133,34 @@ export class DownloadService {
     throw new Error(lastError || 'Không thể kết nối đến máy chủ Cobalt nào.');
   }
 
+  // Lấy đường dẫn file cookie (hỗ trợ cả đường dẫn file hoặc text content từ biến môi trường)
+  private getCookiesFilePath(): string | null {
+    // 1. Kiểm tra nếu có đường dẫn file cấu hình sẵn
+    if (process.env.YOUTUBE_COOKIES_PATH && fs.existsSync(process.env.YOUTUBE_COOKIES_PATH)) {
+      return process.env.YOUTUBE_COOKIES_PATH;
+    }
+
+    // 2. Kiểm tra nếu có nội dung cookie trong biến môi trường YOUTUBE_COOKIES_CONTENT hoặc YOUTUBE_COOKIES
+    const cookieContent = process.env.YOUTUBE_COOKIES_CONTENT || process.env.YOUTUBE_COOKIES;
+    if (cookieContent && cookieContent.trim().length > 0) {
+      const cookieFilePath = path.join(os.tmpdir(), 'youtube_cookies.txt');
+      try {
+        fs.writeFileSync(cookieFilePath, cookieContent.trim(), 'utf-8');
+        return cookieFilePath;
+      } catch (err: any) {
+        this.logger.error(`Failed to write cookies file: ${err.message}`);
+      }
+    }
+
+    // 3. Kiểm tra file cookies.txt đặt tại thư mục làm việc
+    const localCookieRoot = path.join(process.cwd(), 'cookies.txt');
+    if (fs.existsSync(localCookieRoot)) {
+      return localCookieRoot;
+    }
+
+    return null;
+  }
+
   // Cấu hình chung cho yt-dlp để vượt qua bot detection của YouTube trên Datacenter/Cloud
   private getYtDlpOptions(extra: Record<string, any> = {}): Record<string, any> {
     const opts: Record<string, any> = {
@@ -140,9 +171,13 @@ export class DownloadService {
       extractorArgs: 'youtube:player_client=ios,android,web',
       ...extra,
     };
-    if (process.env.YOUTUBE_COOKIES_PATH) {
-      opts.cookies = process.env.YOUTUBE_COOKIES_PATH;
+
+    const cookiePath = this.getCookiesFilePath();
+    if (cookiePath) {
+      this.logger.log(`[yt-dlp] Using YouTube cookies from: ${cookiePath}`);
+      opts.cookies = cookiePath;
     }
+
     return opts;
   }
 
