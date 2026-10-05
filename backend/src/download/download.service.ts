@@ -130,7 +130,23 @@ export class DownloadService {
     throw new Error(lastError || 'Không thể kết nối đến máy chủ Cobalt nào.');
   }
 
-  // Tải nội dung media (Đa chế độ: Tải cục bộ bằng ytdl-core, hoặc fallback sang Cobalt)
+  // Cấu hình chung cho yt-dlp để vượt qua bot detection của YouTube trên Datacenter/Cloud
+  private getYtDlpOptions(extra: Record<string, any> = {}): Record<string, any> {
+    const opts: Record<string, any> = {
+      noCheckCertificates: true,
+      noWarnings: true,
+      preferFreeFormats: true,
+      noPlaylist: true,
+      extractorArgs: 'youtube:player_client=ios,android,web',
+      ...extra,
+    };
+    if (process.env.YOUTUBE_COOKIES_PATH) {
+      opts.cookies = process.env.YOUTUBE_COOKIES_PATH;
+    }
+    return opts;
+  }
+
+  // Tải nội dung media (Đa chế độ: Ưu tiên tải cục bộ bằng yt-dlp, fallback sang Cobalt nếu cần)
   async downloadMedia(
     url: string,
     videoQuality?: string,
@@ -143,26 +159,12 @@ export class DownloadService {
 
     const cleanUrl = url.trim();
 
-    // 1. Trường hợp 1080p: Luôn thử Cobalt trước (vì ytdl-core không gộp được video/audio 1080p nếu thiếu FFmpeg cục bộ)
-    if (!isAudioOnly && videoQuality === '1080') {
-      try {
-        this.logger.log('1080p requested. Trying Cobalt API fallback first...');
-        const result = await this.downloadViaCobalt(cleanUrl, videoQuality, isAudioOnly, audioBitrate);
-        return result;
-      } catch (err) {
-        this.logger.warn(`Cobalt download failed for 1080p: ${err.message}. Falling back to local 720p extraction...`);
-        // Fallback tự động xuống tải 720p cục bộ (để người dùng luôn tải được file xem được)
-        return this.downloadLocally(cleanUrl, '720', false);
-      }
-    }
-
-    // 2. Các trường hợp khác (720p, 360p, 240p, 144p hoặc Âm thanh): Tải cục bộ bằng ytdl-core cho ổn định 100%
+    // Thử tải cục bộ bằng yt-dlp trước (với giả lập mobile client ios,android)
     try {
-      this.logger.log(`Extracting stream locally for ${isAudioOnly ? 'audio' : videoQuality + 'p'}...`);
-      return await this.downloadLocally(cleanUrl, videoQuality || '720', !!isAudioOnly);
+      this.logger.log(`Extracting stream locally for ${isAudioOnly ? 'audio' : (videoQuality || '1080') + 'p'}...`);
+      return await this.downloadLocally(cleanUrl, videoQuality || '1080', !!isAudioOnly);
     } catch (err) {
-      this.logger.warn(`Local extraction failed: ${err.message}. Trying Cobalt API fallback as last resort...`);
-      // Nếu tải cục bộ lỗi (ví dụ: thuật toán signature thay đổi chưa update), fallback ngược sang Cobalt
+      this.logger.warn(`Local extraction failed: ${err.message}. Trying Cobalt API fallback...`);
       try {
         return await this.downloadViaCobalt(cleanUrl, videoQuality, isAudioOnly, audioBitrate);
       } catch (cobaltErr) {
@@ -176,17 +178,12 @@ export class DownloadService {
 
   // Tải trực tiếp bằng yt-dlp (qua youtube-dl-exec)
   private async downloadLocally(url: string, videoQuality: string, isAudioOnly: boolean): Promise<any> {
-    const info: any = await youtubedl(url, {
-      dumpSingleJson: true,
-      noCheckCertificates: true,
-      noWarnings: true,
-      preferFreeFormats: true,
-      noPlaylist: true,
-      addHeader: [
-        'referer:youtube.com',
-        'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      ]
-    });
+    const info: any = await youtubedl(
+      url,
+      this.getYtDlpOptions({
+        dumpSingleJson: true,
+      })
+    );
 
     const title = info.title || 'Youtube_Download';
     const cleanTitle = title.replace(/[\\/:*?"<>|]/g, '_'); // Xóa ký tự lỗi tên file
@@ -220,17 +217,13 @@ export class DownloadService {
   async pipeStream(url: string, formatId: string, res: express.Response): Promise<void> {
     this.logger.log(`[Piping Stream] Starting yt-dlp stream for format ${formatId}...`);
     
-    const subprocess = youtubedl.exec(url, {
-      format: formatId,
-      output: '-', // Ghi luồng trực tiếp ra stdout
-      noCheckCertificates: true,
-      noWarnings: true,
-      noPlaylist: true,
-      addHeader: [
-        'referer:youtube.com',
-        'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      ]
-    });
+    const subprocess = youtubedl.exec(
+      url,
+      this.getYtDlpOptions({
+        format: formatId,
+        output: '-', // Ghi luồng trực tiếp ra stdout
+      })
+    );
 
     if (subprocess.stdout) {
       subprocess.stdout.pipe(res);

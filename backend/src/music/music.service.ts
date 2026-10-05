@@ -40,10 +40,17 @@ export class MusicService {
 
   async getStreamUrl(videoId: string): Promise<string> {
     try {
-      const url = await youtubedl(`https://www.youtube.com/watch?v=${videoId}`, {
+      const options: any = {
         getUrl: true,
         format: 'bestaudio',
-      });
+        noWarnings: true,
+        noCheckCertificates: true,
+        extractorArgs: 'youtube:player_client=ios,android,web',
+      };
+      if (process.env.YOUTUBE_COOKIES_PATH) {
+        options.cookies = process.env.YOUTUBE_COOKIES_PATH;
+      }
+      const url = await youtubedl(`https://www.youtube.com/watch?v=${videoId}`, options);
       // The exec command returns string type but typed as generic, need to ensure string
       return (url as unknown as string).trim();
     } catch (error) {
